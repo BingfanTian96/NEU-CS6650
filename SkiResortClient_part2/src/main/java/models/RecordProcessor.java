@@ -34,7 +34,7 @@ public class RecordProcessor {
     }
 
     /**
-     * Process.
+     * Process the results to CSV file.
      */
     public void process(){
         writeToCSV();

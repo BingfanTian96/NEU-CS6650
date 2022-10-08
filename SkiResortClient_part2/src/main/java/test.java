@@ -19,7 +19,7 @@ public class test {
         LiftData tmp = new LiftData(1, "2022", "2", 12, liftRide);
         ApiClient client = new ApiClient();
         // todo: set base path after deploy
-        String basePass = "http://35.87.95.180:8080/SkiResortServlet_war/";
+        String basePass = "http://35.91.151.21:8080/SkiResortServlet_war/";
         client.setBasePath(basePass);
         SkiersApi api = new SkiersApi();
         api.setApiClient(client);

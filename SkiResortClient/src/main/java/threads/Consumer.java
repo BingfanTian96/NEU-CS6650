@@ -32,7 +32,7 @@ public class Consumer implements Runnable{
     private CountDownLatch subLatch;
     private SendResult result;
     private static int RETRY_TIMES = 5;
-    private String BASE_PATH = "http://35.87.95.180:8080/SkiResortServlet_war/";
+    private String BASE_PATH = "http://35.91.151.21:8080/SkiResortServlet_war/";
 
     /**
      * Instantiates a new Consumer.

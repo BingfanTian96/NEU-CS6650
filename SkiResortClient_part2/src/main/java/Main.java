@@ -32,7 +32,6 @@ public class Main {
 
         long start = System.currentTimeMillis();
         BlockingQueue<LiftData> blockingQueue = new LinkedBlockingDeque<>(MAX_QUEUE_CAPACITY);
-        List<Thread> threads = new ArrayList<>();
         SendResult sendResult = new SendResult();
         // create 1 producer thread to generate lift data
         Producer producer = new Producer(blockingQueue, TOTAL_COUNT);
@@ -45,25 +44,34 @@ public class Main {
         // phase 1
         runPhase(PHASE1_THREAD_COUNT, blockingQueue, PHASE1_REQUEST_COUNT, sendResult, records);
         System.out.println("------------------Phase1 output------------------");
-        int phase1Count = sendResult.getSuccessfulPosts();
-        System.out.println("total requests has send by Phase 1 threads: " + phase1Count);
-
         long phase1 = System.currentTimeMillis();
-        System.out.println("Phase 1 Time takes: " + (phase1 - start) + "ms");
+        long phase1WallTime = phase1 - start;
+        int phase1Success = sendResult.getSuccessfulPosts();
+        int phase1Failed = sendResult.getFailedPosts();
+        long phase1Throughput = 1000L * (phase1Success + phase1Failed) / phase1WallTime;
+        System.out.println("Phase 1 Time takes: " + phase1WallTime + "ms");
+        System.out.println("Number of thread: " + PHASE1_THREAD_COUNT);
+        System.out.println("Number of successful requests sent: " + phase1Success);
+        System.out.println("Number of unsuccessful requests: " + phase1Failed);
+        System.out.println("The phase 1 throughput in requests per second " + phase1Throughput);
 
         // phase 2
         runPhase(PHASE2_THREAD_COUNT, blockingQueue, PHASE2_REQUEST_COUNT, sendResult, records);
         System.out.println("------------------Phase2 output------------------");
-        int phas2Count = sendResult.getSuccessfulPosts();
-        System.out.println("total requests has send by Phase 2 threads: " + (phas2Count - phase1Count));
         long phase2 = System.currentTimeMillis();
-        System.out.println("Phase 2 Time takes: " + (phase2 - phase1) + "ms");
+        long phase2WallTime = phase2 - phase1;
+        int phase2Success = sendResult.getSuccessfulPosts() - phase1Success;
+        int phase2Failed = sendResult.getFailedPosts() - phase1Failed;
+        long phase2Throughput = 1000L * (phase2Success + phase2Failed) / phase2WallTime;
+        System.out.println("Phase 2 Time takes: " + phase2WallTime + "ms");
+        System.out.println("Number of thread: " + PHASE2_THREAD_COUNT);
+        System.out.println("Number of successful requests sent: " + phase2Success);
+        System.out.println("Number of unsuccessful requests: " + phase2Failed);
+        System.out.println("The phase 2 throughput in requests per second " + phase2Throughput);
 
-        System.out.println("total requests has send: " +
-                (sendResult.getSuccessfulPosts() + sendResult.getFailedPosts()));
         // Part1 output
         long end = System.currentTimeMillis();
-        System.out.println("------------------Part1 output------------------");
+        System.out.println("------------------Part1 overall output------------------");
         long wallTime = end - start;
         int success = sendResult.getSuccessfulPosts();
         int failed = sendResult.getFailedPosts();

@@ -34,7 +34,7 @@ public class Consumer implements Runnable{
     private CountDownLatch subLatch;
     private SendResult result;
     private static int RETRY_TIMES = 5;
-    private String BASE_PATH = "http://35.87.95.180:8080/SkiResortServlet_war/";
+    private String BASE_PATH = "http://35.91.151.21:8080/SkiResortServlet_war/";
     private Queue<Record> records;
 
     /**
@@ -79,8 +79,6 @@ public class Consumer implements Runnable{
     private void sendRequest(LiftData tmp) {
         if (tmp != null) {
             ApiClient client = new ApiClient();
-            // todo: Update base path after deploy
-            // localhost:
             client.setBasePath(BASE_PATH);
             SkiersApi api = new SkiersApi();
             api.setApiClient(client);
@@ -89,10 +87,10 @@ public class Consumer implements Runnable{
                     long startTime = System.currentTimeMillis();
                     ApiResponse<Void> res = api.writeNewLiftRideWithHttpInfo(tmp.getLiftRide(),
                             tmp.getResortID(), tmp.getSeasonID(), tmp.getDayID(), tmp.getSkierID());
+
                     long endTime = System.currentTimeMillis();
                     if (res.getStatusCode() == 201 || res.getStatusCode() == 200) {
                         result.addSuccessfulPost(1);
-                        // todo write successful records before break here
                         this.records.offer(new Record(startTime, "POST",
                                 endTime - startTime, res.getStatusCode()));
                         break;
