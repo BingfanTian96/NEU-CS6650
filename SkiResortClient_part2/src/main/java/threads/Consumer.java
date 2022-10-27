@@ -34,8 +34,11 @@ public class Consumer implements Runnable{
     private CountDownLatch subLatch;
     private SendResult result;
     private static int RETRY_TIMES = 5;
-    private String BASE_PATH = "http://35.91.151.21:8080/SkiResortServlet_war/";
+    private String BASE_PATH = "http://localhost:8080/HW2_Server_war_exploded/";
     private Queue<Record> records;
+
+    private int success = 0;
+    private int failed = 0;
 
     /**
      * Instantiates a new Consumer.
@@ -73,6 +76,10 @@ public class Consumer implements Runnable{
                 break;
             }
         }
+        for (int i = 0; i < success; i++)
+            result.addSuccessfulPost(1);
+        for (int i = 0; i < failed; i++)
+            result.addFailedPost(1);
         latch.countDown();
     }
 
@@ -90,13 +97,13 @@ public class Consumer implements Runnable{
 
                     long endTime = System.currentTimeMillis();
                     if (res.getStatusCode() == 201 || res.getStatusCode() == 200) {
-                        result.addSuccessfulPost(1);
+                        success++;
                         this.records.offer(new Record(startTime, "POST",
                                 endTime - startTime, res.getStatusCode()));
                         break;
                     }
                     if (i == RETRY_TIMES - 1) {
-                        result.addFailedPost(1);
+                        failed++;
                         this.records.offer(new Record(startTime, "POST",
                                 endTime - startTime, res.getStatusCode()));
                     }

@@ -19,14 +19,14 @@ public class test {
         LiftData tmp = new LiftData(1, "2022", "2", 12, liftRide);
         ApiClient client = new ApiClient();
         // todo: set base path after deploy
-        String basePass = "http://35.87.95.180:8080/SkiResortServlet_war/";
+        String basePass = "http://localhost:8080/SkiResortServlet_war/";
         client.setBasePath(basePass);
         SkiersApi api = new SkiersApi();
         api.setApiClient(client);
         long startTime = System.currentTimeMillis();
         int success = 0;
         int failed = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1; i++) {
             try {
                 ApiResponse<Void> res = api.writeNewLiftRideWithHttpInfo(tmp.getLiftRide(),
                         tmp.getResortID(), tmp.getSeasonID(), tmp.getDayID(), tmp.getSkierID());
