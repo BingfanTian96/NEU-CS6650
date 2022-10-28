@@ -7,6 +7,7 @@ package Models;
  * @date: 10/3/22 7:25 PM
  */
 public class LiftRide {
+
     private Integer time = null;
     private Integer liftID = null;
 

@@ -23,9 +23,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Main {
     private static final int MAX_QUEUE_CAPACITY = 500;
     private static final int PHASE1_THREAD_COUNT = 32;
-    private static final int PHASE2_THREAD_COUNT = 84;
+    private static final int PHASE2_THREAD_COUNT = 100;
     private static final int PHASE1_REQUEST_COUNT = 1000;
-    private static final int PHASE2_REQUEST_COUNT = 2000;
+    private static final int PHASE2_REQUEST_COUNT = 1680;
     private static final int TOTAL_COUNT = 200000;
 
     public static void main(String[] args) throws InterruptedException {

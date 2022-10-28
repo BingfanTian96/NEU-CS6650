@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DeliverCallback;
@@ -52,10 +53,16 @@ public class Processor implements Runnable {
         try {
             final Channel channel = connection.createChannel();
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+
             channel.basicQos(1);
+
             System.out.println(" [*] Thread waiting for messages. To exit press CTRL+C");
+
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+
                 String message = new String(delivery.getBody(), "UTF-8");
+//                System.out.println(" [x] Received '" + message + "'");
                 // get json obj from the queue
                 JsonObject json = gson.fromJson(message, JsonObject.class);
                 // get key
@@ -68,8 +75,8 @@ public class Processor implements Runnable {
                     map.put(key, value);
                 }
                 channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-                System.out.println( "Callback thread ID = " + java.lang.Thread.currentThread().getId() +
-                        " Received lift date for skier '" + key + "'");
+//                System.out.println( "Callback thread ID = " + java.lang.Thread.currentThread().getId() +
+//                        " Received lift date for skier '" + key + "'");
             };
             channel.basicConsume(QUEUE_NAME, false, deliverCallback, consumerTag -> { });
 

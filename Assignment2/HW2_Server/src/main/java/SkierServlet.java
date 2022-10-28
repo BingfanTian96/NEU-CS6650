@@ -1,10 +1,9 @@
+import Models.LiftData;
 import Models.LiftRide;
 import RMQPool.RMQChannelFactory;
-import RMQPool.RMQChannelPool;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.MessageProperties;
 import org.apache.commons.pool2.ObjectPool;
@@ -28,12 +27,24 @@ public class SkierServlet extends HttpServlet {
     private Gson gson  = new Gson();
 
     private ObjectPool<Channel> pool;
+    private ConnectionFactory factory;
 
 
 
     @Override
     public void init() {
-        this.pool = new GenericObjectPool<Channel>(new RMQChannelFactory());
+        try {
+            this.factory = new ConnectionFactory();
+            factory.setHost("34.217.11.149");
+            factory.setPort(5672);
+            factory.setUsername("guest");
+            factory.setPassword("guest");
+            this.pool = new GenericObjectPool<Channel>(new RMQChannelFactory(factory.newConnection()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -93,24 +104,19 @@ public class SkierServlet extends HttpServlet {
             }
             LiftRide liftRide = gson.fromJson(sb.toString(), LiftRide.class);
             if(isBodyValid(liftRide)) {
-//                JsonObject liftInfo = new JsonObject();
-//                liftInfo.addProperty("resortID", Integer.valueOf(urlParts[1]));
-//                liftInfo.addProperty("seasonID", Integer.valueOf(urlParts[3]));
-//                liftInfo.addProperty("dayID", Integer.valueOf(urlParts[5]));
-//                liftInfo.addProperty("skierId", Integer.valueOf(urlParts[7]));
-//                liftInfo.addProperty("time", liftRide.getTime());
-//                liftInfo.addProperty("liftId", liftRide.getLiftID());
-//                String liftInfo = "resortID" + urlParts[1] + "seasonID" + urlParts[3] + "dayID" + urlParts[5] +
-
-                try {
-                    Channel channel = pool.borrowObject();
-                    channel.queueDeclare(QUEUE_NAME, true, false, false, null);
-//                    channel.basicPublish("", QUEUE_NAME, null,
-//                            liftInfo.toString().getBytes("UTF-8"));
-                    channel.basicPublish("", QUEUE_NAME, MessageProperties.PERSISTENT_TEXT_PLAIN,
-                            gson.toJson(liftRide).getBytes(StandardCharsets.UTF_8));
-                } catch (Exception e) {
-                    throw new RuntimeException("Unable to borrow channel from pool" + e.toString());
+                JsonObject liftInfo = new JsonObject();
+                liftInfo.addProperty("resortID", Integer.valueOf(urlParts[1]));
+                liftInfo.addProperty("seasonID", Integer.valueOf(urlParts[3]));
+                liftInfo.addProperty("dayID", Integer.valueOf(urlParts[5]));
+                liftInfo.addProperty("skierId", Integer.valueOf(urlParts[7]));
+                liftInfo.addProperty("time", liftRide.getTime());
+                liftInfo.addProperty("liftId", liftRide.getLiftID());
+                if (sendToQueue(liftInfo)) {
+                    response.setStatus(HttpServletResponse.SC_CREATED);
+                    response.getWriter().write(gson.toJson("success"));
+                } else {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("failed");
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -120,17 +126,17 @@ public class SkierServlet extends HttpServlet {
     }
 
     private boolean isUrlValid(String[] urlPath) {
-//        if(urlPath.length != 8) {
-//            return false;
-//        } else {
-//            return isNumeric(urlPath[1]) && urlPath[2].equals("seasons") &&
-//                    isNumeric(urlPath[3]) && urlPath[3].length() == 4 && urlPath[4].equals("days") &&
-//                    isNumeric(urlPath[5]) &&
-//                    Integer.parseInt(urlPath[5]) >= DAY_MIN &&
-//                    Integer.parseInt(urlPath[5]) <= DAY_MAX &&
-//                    urlPath[6].equals("skiers") && isNumeric(urlPath[7]);
-//        }
-        return true;
+        if(urlPath.length != 8) {
+            return false;
+        } else {
+            return isNumeric(urlPath[1]) && urlPath[2].equals("seasons") &&
+                    isNumeric(urlPath[3]) && urlPath[3].length() == 4 && urlPath[4].equals("days") &&
+                    isNumeric(urlPath[5]) &&
+                    Integer.parseInt(urlPath[5]) >= DAY_MIN &&
+                    Integer.parseInt(urlPath[5]) <= DAY_MAX &&
+                    urlPath[6].equals("skiers") && isNumeric(urlPath[7]);
+        }
+
     }
 
     private boolean isNumeric(String s) {
@@ -143,8 +149,30 @@ public class SkierServlet extends HttpServlet {
     }
 
     private boolean isBodyValid(LiftRide liftRide) {
-//        if(liftRide.getTime() == null || liftRide.getLiftID() == null)
-//            return false;
+        if(liftRide.getTime() == null || liftRide.getLiftID() == null)
+            return false;
         return true;
+    }
+
+    private boolean sendToQueue(JsonObject liftInfo) {
+        Channel channel = null;
+        try {
+            channel = pool.borrowObject();
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            channel.basicPublish("", QUEUE_NAME, MessageProperties.PERSISTENT_TEXT_PLAIN,
+                    liftInfo.toString().getBytes(StandardCharsets.UTF_8));
+            return true;
+        } catch (Exception e) {
+            System.out.println("Unable to borrow channel from pool" + e.toString());
+            return false;
+        } finally {
+            if (channel != null) {
+                try {
+                    pool.returnObject(channel);
+                } catch (Exception e) {
+                    System.out.println("Cannot return channel");
+                }
+            }
+        }
     }
 }

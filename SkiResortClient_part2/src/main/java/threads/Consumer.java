@@ -33,8 +33,9 @@ public class Consumer implements Runnable{
     // total requests counter for each thread
     private CountDownLatch subLatch;
     private SendResult result;
-    private static int RETRY_TIMES = 5;
-    private String BASE_PATH = "http://localhost:8080/HW2_Server_war_exploded/";
+    private int RETRY_TIMES = 5;
+//    private String BASE_PATH = "http://34.217.11.149:8080/HW2_Server_war_exploded/";
+private String BASE_PATH = "http://34.217.11.149:8080/HW2_Server/";
     private Queue<Record> records;
 
     private int success = 0;
@@ -94,7 +95,6 @@ public class Consumer implements Runnable{
                     long startTime = System.currentTimeMillis();
                     ApiResponse<Void> res = api.writeNewLiftRideWithHttpInfo(tmp.getLiftRide(),
                             tmp.getResortID(), tmp.getSeasonID(), tmp.getDayID(), tmp.getSkierID());
-
                     long endTime = System.currentTimeMillis();
                     if (res.getStatusCode() == 201 || res.getStatusCode() == 200) {
                         success++;

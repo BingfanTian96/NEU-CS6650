@@ -14,14 +14,14 @@ import java.util.concurrent.TimeoutException;
  * @date: 10/23/22 11:36 PM
  */
 public class Consumer {
-    private final static Integer NUM_THREADS = 512;
+    private final static Integer NUM_THREADS = 800;
 
     public static void main(String[] args) throws IOException, TimeoutException {
 
         ConnectionFactory factory = new ConnectionFactory();
         ConcurrentHashMap<Integer, List<JsonObject>> map = new ConcurrentHashMap<>();
 
-        factory.setHost("localhost");
+        factory.setHost("34.217.11.149");
         factory.setPort(5672);
         factory.setUsername("guest");
         factory.setPassword("guest");

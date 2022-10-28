@@ -9,6 +9,7 @@ import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The type Rmq channel factory.
@@ -20,38 +21,27 @@ import java.io.IOException;
  */
 public class RMQChannelFactory extends BasePooledObjectFactory<Channel>{
 
-    ConnectionFactory factory;
-
     private int count;
+    private final Connection connection;
 
     /**
      * Instantiates a new Rmq channel factory.
      *
      */
-    public RMQChannelFactory() {
-        this.factory = new ConnectionFactory();
-        factory.setHost("localhost");
-        factory.setPort(5672);
-        factory.setUsername("guest");
-        factory.setPassword("guest");
+    public RMQChannelFactory(Connection connection) throws IOException, TimeoutException {
+        this.connection = connection;
         this.count = 0;
     }
 
     @Override
     synchronized public Channel create() throws Exception {
         count++;
-        Connection connection = factory.newConnection();
-        return connection.createChannel();
+        return this.connection.createChannel();
     }
 
     @Override
     public PooledObject<Channel> wrap(Channel channel) {
         return new DefaultPooledObject<Channel>(channel);
-    }
-
-    @Override
-    public void destroyObject(PooledObject<Channel> p) throws Exception {
-        p.getObject().close();
     }
 
     /**
