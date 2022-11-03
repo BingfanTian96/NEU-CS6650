@@ -3,6 +3,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
@@ -14,14 +15,14 @@ import java.util.concurrent.TimeoutException;
  * @date: 10/23/22 11:36 PM
  */
 public class Consumer {
-    private final static Integer NUM_THREADS = 800;
+    private final static Integer NUM_THREADS = 8;
 
     public static void main(String[] args) throws IOException, TimeoutException {
 
         ConnectionFactory factory = new ConnectionFactory();
-        ConcurrentHashMap<Integer, List<JsonObject>> map = new ConcurrentHashMap<>();
+        HashMap<Integer, List<JsonObject>> map = new HashMap<>();
 
-        factory.setHost("34.217.11.149");
+        factory.setHost("54.187.208.5");
         factory.setPort(5672);
         factory.setUsername("guest");
         factory.setPassword("guest");

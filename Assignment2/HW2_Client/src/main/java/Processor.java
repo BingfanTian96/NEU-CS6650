@@ -7,6 +7,7 @@ import com.rabbitmq.client.DeliverCallback;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -30,7 +31,7 @@ public class Processor implements Runnable {
     /**
      * The Map.
      */
-    ConcurrentHashMap<Integer, List<JsonObject>> map;
+    HashMap<Integer, List<JsonObject>> map;
 
     /**
      * The Connection.
@@ -43,7 +44,7 @@ public class Processor implements Runnable {
      * @param connection the connection
      * @param map        the map
      */
-    public Processor(Connection connection, ConcurrentHashMap<Integer, List<JsonObject>> map) {
+    public Processor(Connection connection, HashMap<Integer, List<JsonObject>> map) {
         this.connection = connection;
         this.map = map;
     }

@@ -35,7 +35,7 @@ public class Consumer implements Runnable{
     private SendResult result;
     private int RETRY_TIMES = 5;
 //    private String BASE_PATH = "http://34.217.11.149:8080/HW2_Server_war_exploded/";
-private String BASE_PATH = "http://34.217.11.149:8080/HW2_Server/";
+private String BASE_PATH = "http://54.187.208.5:8080/HW2_Server/";
     private Queue<Record> records;
 
     private int success = 0;
