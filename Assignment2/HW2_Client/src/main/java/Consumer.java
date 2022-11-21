@@ -9,20 +9,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 
 /**
+ * The type Consumer.
+ *
  * @className: Consumer
  * @author: Bingfan Tian
  * @description: TODO
- * @date: 10/23/22 11:36 PM
+ * @date: 10 /23/22 11:36 PM
  */
 public class Consumer {
     private final static Integer NUM_THREADS = 8;
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws IOException      the io exception
+     * @throws TimeoutException the timeout exception
+     */
     public static void main(String[] args) throws IOException, TimeoutException {
 
         ConnectionFactory factory = new ConnectionFactory();
-        HashMap<Integer, List<JsonObject>> map = new HashMap<>();
+        HashMap<Integer, List<String>> map = new HashMap<>();
 
-        factory.setHost("54.187.208.5");
+        factory.setHost("35.91.107.69");
         factory.setPort(5672);
         factory.setUsername("guest");
         factory.setPassword("guest");

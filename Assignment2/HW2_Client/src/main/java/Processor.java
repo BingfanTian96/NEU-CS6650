@@ -31,7 +31,7 @@ public class Processor implements Runnable {
     /**
      * The Map.
      */
-    HashMap<Integer, List<JsonObject>> map;
+    HashMap<Integer, List<String>> map;
 
     /**
      * The Connection.
@@ -44,7 +44,7 @@ public class Processor implements Runnable {
      * @param connection the connection
      * @param map        the map
      */
-    public Processor(Connection connection, HashMap<Integer, List<JsonObject>> map) {
+    public Processor(Connection connection, HashMap<Integer, List<String>> map) {
         this.connection = connection;
         this.map = map;
     }
@@ -69,10 +69,10 @@ public class Processor implements Runnable {
                 // get key
                 Integer key = Integer.valueOf(String.valueOf(json.get("skierId")));
                 if(map.containsKey(key)){
-                    map.get(key).add(json);
+                    map.get(key).add(json.toString());
                 } else{
-                    List<JsonObject> value = new ArrayList<>();
-                    value.add(json);
+                    List<String> value = new ArrayList<>();
+                    value.add(json.toString());
                     map.put(key, value);
                 }
                 channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);

@@ -35,7 +35,7 @@ public class SkierServlet extends HttpServlet {
     public void init() {
         try {
             this.factory = new ConnectionFactory();
-            factory.setHost("54.187.208.5");
+            factory.setHost("35.91.107.69");
             factory.setPort(5672);
             factory.setUsername("guest");
             factory.setPassword("guest");
@@ -105,9 +105,9 @@ public class SkierServlet extends HttpServlet {
             LiftRide liftRide = gson.fromJson(sb.toString(), LiftRide.class);
             if(isBodyValid(liftRide)) {
                 JsonObject liftInfo = new JsonObject();
-                liftInfo.addProperty("resortID", Integer.valueOf(urlParts[1]));
-                liftInfo.addProperty("seasonID", Integer.valueOf(urlParts[3]));
-                liftInfo.addProperty("dayID", Integer.valueOf(urlParts[5]));
+                liftInfo.addProperty("resortId", Integer.valueOf(urlParts[1]));
+                liftInfo.addProperty("seasonId", Integer.valueOf(urlParts[3]));
+                liftInfo.addProperty("dayId", Integer.valueOf(urlParts[5]));
                 liftInfo.addProperty("skierId", Integer.valueOf(urlParts[7]));
                 liftInfo.addProperty("time", liftRide.getTime());
                 liftInfo.addProperty("liftId", liftRide.getLiftID());
