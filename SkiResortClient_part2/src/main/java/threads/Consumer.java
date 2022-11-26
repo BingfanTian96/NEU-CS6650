@@ -34,8 +34,8 @@ public class Consumer implements Runnable{
     private CountDownLatch subLatch;
     private SendResult result;
     private int RETRY_TIMES = 5;
-//    private String BASE_PATH = "http://54.189.208.72:8080/HW2_Server/";
-private String BASE_PATH = "http://ass2-940764346.us-west-2.elb.amazonaws.com:8080/HW2_Server/";
+    private String BASE_PATH = "http://34.211.4.34:8080/HW3_Server/";
+//    private String BASE_PATH = "http://localhost:8080/HW2_Server_war_exploded/";
     private Queue<Record> records;
 
     private int success = 0;
@@ -85,6 +85,7 @@ private String BASE_PATH = "http://ass2-940764346.us-west-2.elb.amazonaws.com:80
     }
 
     private void sendRequest(LiftData tmp) {
+        RETRY_TIMES = 5;
         if (tmp != null) {
             ApiClient client = new ApiClient();
             client.setBasePath(BASE_PATH);

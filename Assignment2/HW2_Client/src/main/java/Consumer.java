@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException;
  * @date: 10 /23/22 11:36 PM
  */
 public class Consumer {
-    private final static Integer NUM_THREADS = 8;
+    private final static Integer NUM_THREADS = 32;
 
     /**
      * The entry point of application.
@@ -31,7 +31,7 @@ public class Consumer {
         ConnectionFactory factory = new ConnectionFactory();
         HashMap<Integer, List<String>> map = new HashMap<>();
 
-        factory.setHost("35.91.107.69");
+        factory.setHost("54.213.42.221");
         factory.setPort(5672);
         factory.setUsername("guest");
         factory.setPassword("guest");

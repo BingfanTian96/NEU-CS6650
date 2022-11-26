@@ -7,9 +7,8 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +23,7 @@ import java.util.logging.Logger;
 public class Processor implements Runnable {
 
     private final String QUEUE_NAME = "SkierPostQueue";
+    private final String RESORT_QUEUE_NAME = "ResortPostQueue";
     /**
      * The Gson.
      */
@@ -53,6 +53,7 @@ public class Processor implements Runnable {
     public void run() {
         try (Jedis jedis = pool.getResource()) {
             final Channel channel = connection.createChannel();
+
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
             channel.basicQos(1);
@@ -67,23 +68,35 @@ public class Processor implements Runnable {
                 JsonObject json = gson.fromJson(message, JsonObject.class);
                 // get key
                 String skierId = String.valueOf(json.get("skierId"));
-                String resortID = String.valueOf(json.get("resortID"));
+                String resortID = String.valueOf(json.get("resortId"));
                 String seasonId = String.valueOf(json.get("seasonId"));
                 String dayId = String.valueOf(json.get("dayId"));
                 String liftId = String.valueOf(json.get("liftId"));
                 String time = String.valueOf(json.get("time"));
-                String vertical = String.valueOf(Integer.parseInt(liftId) * 10);
-
-                if(map.containsKey(key)){
-                    map.get(key).add(json.toString());
-                } else{
-                    List<String> value = new ArrayList<>();
-                    value.add(json.toString());
-                    map.put(key, value);
+                int vertical = Integer.parseInt(liftId) * 10;
+                String info = resortID + "," + seasonId + "," + dayId + ","  + liftId + "," + time + "," + vertical;
+//                System.out.println(skierId + ": " + info);
+                // For skier N, how many days have they skied this season?
+                // update total days
+                // hash => skierId => seasonId => days
+                Map<String, String> skierFields = jedis.exists(skierId)? jedis.hgetAll(skierId): new HashMap<>();
+                if (skierFields.containsKey(seasonId)) {
+                    int preDays = Integer.parseInt(jedis.hget(skierId, seasonId));
+                    jedis.hset(skierId, seasonId, String.valueOf(preDays + 1));
+                } else {
+                    jedis.hset(skierId, seasonId, "1");
                 }
+                // For skier N, what are the vertical totals for each ski day?
+                // update total verticals
+                // hash => skierId => dayId => total verticals
+                if(skierFields.containsKey(dayId)) {
+                    int preVertical = Integer.parseInt(jedis.hget(skierId, dayId));
+                    jedis.hset(skierId, dayId, String.valueOf(preVertical + vertical));
+                } else {
+                    jedis.hset(skierId, dayId, String.valueOf(vertical));
+                }
+
                 channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-//                System.out.println( "Callback thread ID = " + java.lang.Thread.currentThread().getId() +
-//                        " Received lift date for skier '" + key + "'");
             };
             channel.basicConsume(QUEUE_NAME, false, deliverCallback, consumerTag -> { });
 
