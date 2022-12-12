@@ -36,10 +36,10 @@ public class Consumer {
 //        HashMap<Integer, List<String>> map = new HashMap<>();
         JedisPoolConfig config = new JedisPoolConfig();
         config.setMaxTotal(128);
-        JedisPool pool = new JedisPool(config, "34.219.30.105", 6379);
+        JedisPool pool = new JedisPool(config, "localhost", 6379);
         ConnectionFactory factory = new ConnectionFactory();
 
-        factory.setHost("35.91.117.110");
+        factory.setHost("localhost");
         factory.setPort(5672);
         factory.setUsername("guest");
         factory.setPassword("guest");

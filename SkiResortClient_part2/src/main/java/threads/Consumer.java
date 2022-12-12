@@ -34,7 +34,7 @@ public class Consumer implements Runnable{
     private CountDownLatch subLatch;
     private SendResult result;
     private int RETRY_TIMES = 5;
-    private String BASE_PATH = "http://34.211.4.34:8080/HW3_Server/";
+    private String BASE_PATH = "http://localhost:8080/HW3_Server/";
 //    private String BASE_PATH = "http://localhost:8080/HW2_Server_war_exploded/";
     private Queue<Record> records;
 
